@@ -38,13 +38,13 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
 export default {
   data() {
     return {
       form: {
         input: '',
       },
-      todoList: [],
       rules: {
         input: [
           {
@@ -56,24 +56,28 @@ export default {
       },
     }
   },
+  computed: {
+    ...mapGetters({
+      todoList: 'todo/todoList',
+    }),
+  },
   methods: {
+    ...mapActions({
+      add: 'todo/handleAdd',
+      check: 'todo/handleCheck',
+      remove: 'todo/handleDelete',
+    }),
     handleAdd() {
-      this.todoList.push({
-        title: this.form.input,
-        isChecked: false,
-      })
-      this.$refs.form.resetFields()
+      if (this.form.input) {
+        this.add(this.form.input)
+        this.$refs.form.resetFields()
+      }
     },
     handleCheck(index) {
-      this.todoList = this.todoList.map((todo, i) => {
-        return {
-          ...todo,
-          isChecked: index === i ? !todo.isChecked : todo.isChecked,
-        }
-      })
+      this.check(index)
     },
     handleDelete(index) {
-      this.todoList.splice(index, 1)
+      this.remove(index)
     },
   },
 }
